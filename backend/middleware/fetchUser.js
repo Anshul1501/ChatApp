@@ -1,5 +1,4 @@
 var jwt = require("jsonwebtoken");
-var JWT_SECRET = "anshul@1234dsf";
 
 const fetchUser = (req, red, next) => {
 
@@ -9,7 +8,7 @@ const fetchUser = (req, red, next) => {
     }
     try {
 
-        const data = jwt.verify(token, JWT_SECRET);
+        const data = jwt.verify(token, process.env.JWT_SECRET);
         req.user = data.user;
         next();
 
