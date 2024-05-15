@@ -1,20 +1,40 @@
-var jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-const fetchUser = (req, red, next) => {
+const fetchUser = async(req, res, next) => {
+    let token;
 
-    const token = req.header(("auth-token"));
-    if (!token) {
-        res.status(401).send({ error: "Please authenticate user using valid token" });
+    const authHeader = req.headers.authorization;
+    console.log("Authorization Header:", authHeader);
+
+    if (!authHeader) {
+        return res.status(401).json({ error: "Unauthorized - Missing Authorization header" });
     }
+
+    if (authHeader.startsWith("Bearer ")) {
+        token = authHeader.split(" ")[1];
+    } else {
+        return res.status(401).json({ error: "Unauthorized - Invalid Authorization header format" });
+    }
+
     try {
-
         const data = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = data.user;
-        next();
 
+        if (!data) {
+            return res.status(401).json({ error: "Unauthorized - Invalid token" });
+        }
+
+        const user = await User.findById(data.userId).select("-password");
+        if (!user) {
+            return res.status(404).json({ error: "USER NOT FOUND" });
+        }
+
+        req.user = user;
+        next();
     } catch (error) {
+        console.error("Error verifying token:", error.message);
         res.status(401).send({ error: "Please authenticate using a valid token" });
     }
-}
+};
 
 module.exports = fetchUser;

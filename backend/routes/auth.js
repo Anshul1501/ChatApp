@@ -63,11 +63,11 @@ router.post(
             await user.save();
 
             // Generate JWT token
-            const token = generateTokenAndSetCookie(user._id, res);
-
-            // Send JWT token in response
-            res.json({ token });
-            console.log(token);
+            generateTokenAndSetCookie(user._id, res, (token) => {
+                console.log(token);
+                // Send JWT token in response
+                res.json({ token });
+            });
 
         } catch (error) {
             console.error(error.message);
@@ -77,7 +77,6 @@ router.post(
 );
 
 // Router 2: authnticate user "/api/auth/login".
-
 router.post(
     "/login", [
         // Validation middleware for request body
@@ -96,9 +95,9 @@ router.post(
 
             // Destructure loginIdentifier (email or username) and password from body
             const { loginIdentifier, password } = req.body;
-            let foundUser;
 
             // Check if the loginIdentifier is an email
+            let foundUser;
             if (validator.isEmail(loginIdentifier)) {
                 foundUser = await User.findOne({ email: loginIdentifier });
             } else {
@@ -106,40 +105,17 @@ router.post(
                 foundUser = await User.findOne({ userName: loginIdentifier });
             }
 
-            if (!foundUser) {
-                //  success = false;
-                return res
-                    .status(400)
-                    .json({
-                        success,
-                        error: "Please try to login with correct credentials",
-                    });
+            // Check if user exists and password matches
+            if (!foundUser || !(await bcrypt.compare(password, foundUser.password))) {
+                return res.status(400).json({ error: "Invalid credentials" });
             }
 
-            // Compare the provided password with the hashed password from the database
-            const passwordCompare = await bcrypt.compare(
-                password,
-                foundUser.password
-            );
-            if (!passwordCompare) {
-                // success = false;
-                return res
-                    .status(400)
-                    .json({
-                        success,
-                        error: "Please try to login with correct credentials",
-                    });
-            }
-
-            // If user exists in database and password matches, generate and return the jwt token
             // Generate JWT token
-            const token = generateTokenAndSetCookie(foundUser._id, res);
-
-            // Send JWT token in response
-            success = true;
-            res.json({ success, token });
-            // console.log(token);
-
+            generateTokenAndSetCookie(foundUser._id, res, (token) => {
+                console.log(token);
+                // Send JWT token in response
+                res.json({ success: true, token });
+            });
         } catch (error) {
             console.error(error.message);
             res.status(500).send("Server Error");
