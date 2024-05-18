@@ -14,6 +14,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/messages", require("./routes/messages"));
+app.use("/api/users", require("./routes/userRoutes"));
 
 app.listen(port, () => {
     console.log(`chatApp backend listening on port ${port}`);

@@ -32,9 +32,10 @@ router.post(
 
             // Check if user with email already exists
             let user = await User.findOne({
-                $or: [{ email: req.body.email }, { username: req.body.username }],
+                $or: [{ email: req.body.email }, { username: req.body.userName }],
             });
-            if (!user) {
+            if (user) {
+                console.log('User already exists:', user);
                 return res.status(400).json({ error: "User already exists" });
             }
 
