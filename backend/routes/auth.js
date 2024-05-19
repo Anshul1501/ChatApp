@@ -7,22 +7,22 @@ const User = require("../models/User");
 const validator = require("validator");
 const generateTokenAndSetCookie = require("../utils/generateToken");
 
-//Router 1: Create new account using POST: "/api/auth/singup". Loging not required
-
+// Router 1: Create new account using POST: "/api/auth/singup". Logging not required
 router.post(
-    "/singup", [
+    "/signup", [
         // Validation middleware for request body
-        body("fullName", "Enter your full name").isLength({ min: 3 }),
-        body("userName", "Username must be at least 3 characters"),
-        body("email", "Enter a valid Email").isEmail(),
-        body("password", "Password must be at least 5 characters").isLength({
-            min: 5,
+        body("fullName", "Full name must be at least 3 characters long").isLength({ min: 3 }),
+        body("username", "username must be at least 3 characters").isLength({ min: 3 }),
+        body("password", "Password must be at least 6 characters").isLength({ min: 6 }),
+        body("confirmPassword").custom((value, { req }) => {
+            if (value !== req.body.password) {
+                throw new Error('Passwords do not match');
+            }
+            return true;
         }),
         body("gender", "Enter a valid gender").isIn(["male", "female"]),
-        //  body("profilePic", "Enter a valid profile picture URL").isURL(),
     ],
     async(req, res) => {
-        // Handling POST request to "/api/auth/Singup" endpoint
         try {
             // Validate request body
             const errors = validationResult(req);
@@ -30,10 +30,13 @@ router.post(
                 return res.status(400).json({ errors: errors.array() });
             }
 
-            // Check if user with email already exists
-            let user = await User.findOne({
-                $or: [{ email: req.body.email }, { username: req.body.userName }],
-            });
+            //  // Check if passwords match
+            //  if (req.body.password !== req.body.confirmPassword) {
+            //      return res.status(400).json({ error: "Passwords do not match" });
+            //  }
+
+            // Check if user with the given username already exists
+            let user = await User.findOne({ username: req.body.username });
             if (user) {
                 console.log('User already exists:', user);
                 return res.status(400).json({ error: "User already exists" });
@@ -43,22 +46,16 @@ router.post(
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-            //avtar place holder if profile picture is not uploaded
-            //   const maleProfilePicture = `https://avatar.iran.liara.run/public/boy?userName=${userName}`;
-            //  const femaleProfilePicture = `https://avatar.iran.liara.run/public/girl?userName=${userName}`;
+            const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${req.body.username}`;
+            const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${req.body.username}`;
 
             // Create new user
             user = new User({
                 fullName: req.body.fullName,
-                userName: req.body.userName,
-                email: req.body.email,
+                username: req.body.username,
                 password: hashedPassword,
                 gender: req.body.gender,
-                /*
-                                profilePic: req.body.profilePic ?
-                               req.body.profilePic : req.body.gender === "male" ?
-                               maleProfilePicture : femaleProfilePicture,
-                        */
+                profilePic: req.body.gender === "male" ? boyProfilePic : girlProfilePic,
             });
 
             await user.save();
@@ -77,34 +74,27 @@ router.post(
     }
 );
 
-// Router 2: authnticate user "/api/auth/login".
+
+// Router 2: Authenticate user "/api/auth/login".
 router.post(
     "/login", [
         // Validation middleware for request body
-        body("loginIdentifier", "Enter a valid Email or Username").exists(),
-        body("password", "Password must be at least 5 characters").exists(),
+        body("loginIdentifier", "Enter a valid username").exists(),
+        body("password", "Password must be at least 6 characters").exists(),
     ],
     async(req, res) => {
-        // Handling POST request to "/api/auth/login" endpoint
         try {
-            let success = false;
             // Validate request body
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.status(400).json({ errors: errors.array() });
             }
 
-            // Destructure loginIdentifier (email or username) and password from body
+            // Destructure loginIdentifier (username) and password from body
             const { loginIdentifier, password } = req.body;
 
-            // Check if the loginIdentifier is an email
-            let foundUser;
-            if (validator.isEmail(loginIdentifier)) {
-                foundUser = await User.findOne({ email: loginIdentifier });
-            } else {
-                // If not an email, assume it's a username
-                foundUser = await User.findOne({ userName: loginIdentifier });
-            }
+            // Check if the loginIdentifier is a username
+            const foundUser = await User.findOne({ username: loginIdentifier });
 
             // Check if user exists and password matches
             if (!foundUser || !(await bcrypt.compare(password, foundUser.password))) {
@@ -124,16 +114,15 @@ router.post(
     }
 );
 
-//ROUTE 3: Logout "/api/auth/logout"
-
+// ROUTE 3: Logout "/api/auth/logout"
 router.post("/logout", [], async(req, res) => {
     try {
-        res.cookie("jwt", "", { maxAge: 0 })
-        res.status(200).json({ message: "Logged out succesfully" })
+        res.cookie("jwt", "", { maxAge: 0 });
+        res.status(200).json({ message: "Logged out successfully" });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Server Error");
     }
-})
+});
 
 module.exports = router;
