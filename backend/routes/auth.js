@@ -79,7 +79,7 @@ router.post(
 router.post(
     "/login", [
         // Validation middleware for request body
-        body("loginIdentifier", "Enter a valid username").exists(),
+        body("username", "Enter a valid username").exists(),
         body("password", "Password must be at least 6 characters").exists(),
     ],
     async(req, res) => {
@@ -90,11 +90,11 @@ router.post(
                 return res.status(400).json({ errors: errors.array() });
             }
 
-            // Destructure loginIdentifier (username) and password from body
-            const { loginIdentifier, password } = req.body;
+            // Destructure username (username) and password from body
+            const { username, password } = req.body;
 
-            // Check if the loginIdentifier is a username
-            const foundUser = await User.findOne({ username: loginIdentifier });
+            // Check if the username is a username
+            const foundUser = await User.findOne({ username: username });
 
             // Check if user exists and password matches
             if (!foundUser || !(await bcrypt.compare(password, foundUser.password))) {
