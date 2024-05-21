@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const Conversation = require("../models/Conversation");
-const Messages = require("../models/Messages");
 const fetchUser = require("../middleware/fetchUser");
 
 //Get user from sidebar using GET: "/api/users". Login required

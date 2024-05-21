@@ -12,14 +12,16 @@ const fetchUser = async(req, res, next) => {
         return res.status(401).json({ error: "Unauthorized - Missing Authorization header" });
     }
 
-    if (authHeader.startsWith("Bearer ")) {
-        token = authHeader.split(" ")[1];
+    if (authHeader.startsWith("Bearer")) {
+        token = req.headers.authorization.split(" ")[1];
     } else {
         return res.status(401).json({ error: "Unauthorized - Invalid Authorization header format" });
     }
 
     try {
+        console.log("Verifying token...");
         const data = jwt.verify(token, process.env.JWT_SECRET);
+        console.log("Token verified:", data);
 
         if (!data) {
             return res.status(401).json({ error: "Unauthorized - Invalid token" });
@@ -39,3 +41,4 @@ const fetchUser = async(req, res, next) => {
 };
 
 module.exports = fetchUser;
+
