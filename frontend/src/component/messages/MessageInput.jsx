@@ -10,7 +10,7 @@ const MessageInput = () => {
     e.preventDefault();
     if (!message.trim()) return;
     await sendMessage(message);
-    setMessage(""); // if message is sent successfully then set message string to empty again 
+    setMessage(""); // Reset message input after sending
   };
 
   return (
@@ -23,9 +23,14 @@ const MessageInput = () => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           disabled={loading}
+          aria-label="Message input"
         />
-
-        <button type='submit' className='absolute inset-y-0 end-0 flex items-center pe-3' disabled={loading}>
+        <button
+          type='submit'
+          className='absolute inset-y-0 right-0 flex items-center pr-3'
+          disabled={loading}
+          aria-label="Send message"
+        >
           {loading ? <div className='loading loading-spinner'></div> : <LuSend />}
         </button>
       </div>

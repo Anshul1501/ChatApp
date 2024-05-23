@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
 
@@ -7,7 +7,14 @@ export const useAuthContext = () => {
 }
 
 export const AuthContextProvider = ({ children }) => {
-    const [authUser, setAuthUser] = useState(JSON.parse(localStorage.getItem("chat-user")) || null);
+    const [authUser, setAuthUser] = useState(null);
+
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem("chat-user"));
+        if (storedUser) {
+            setAuthUser(storedUser);
+        }
+    }, []);
 
     return (
         <AuthContext.Provider value={{ authUser, setAuthUser }}>

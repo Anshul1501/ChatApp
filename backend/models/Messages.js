@@ -17,6 +17,10 @@ const MessageSchema = new Schema({
         type: String,
         required: true,
     },
+    content: {
+        type: String,
+        required: true
+    },
     //on frontend will do: createdAt, updatedAt => message.createdAt
 }, { timestamps: true });
 
