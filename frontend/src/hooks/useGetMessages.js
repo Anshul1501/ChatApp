@@ -1,45 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import useConversation from '../zustand/useConversation';
-import toast from 'react-hot-toast';
+import { useEffect, useState } from "react";
+import useConversation from "../zustand/useConversation";
+import toast from "react-hot-toast";
 
 const useGetMessages = () => {
     const [loading, setLoading] = useState(false);
-    const { messages, setMessages, selectedConversation } = useConversation();
+    const { setMessages, selectedConversation } = useConversation();
+    const token = localStorage.getItem('chat-user') ? JSON.parse(localStorage.getItem('chat-user')).token : null;
 
     useEffect(() => {
         const getMessages = async() => {
             if (!selectedConversation || !selectedConversation._id) return;
 
+            setLoading(true);
             try {
-                setLoading(true);
-                const token = localStorage.getItem('chat-user') ? JSON.parse(localStorage.getItem('chat-user')).token : '';
-
-                const res = await fetch(`/api/messages/${selectedConversation._id}`, {
+                const res = await fetch(`/api/messages/get/${selectedConversation._id}`, {
                     method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
-                    }
+                    },
                 });
-
                 if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.error || 'Failed to fetch messages');
+                    const errorText = await res.text();
+                    throw new Error(errorText || 'Failed to fetch messages');
                 }
-
                 const data = await res.json();
-                setMessages(data);
+                if (data.error) throw new Error(data.error);
+
+                setMessages(data); // Assuming messages are directly in the response data
             } catch (error) {
-                toast.error(error.message || 'An error occurred while fetching messages');
+                toast.error(error.message);
             } finally {
                 setLoading(false);
             }
         };
 
         getMessages();
-    }, [selectedConversation, setMessages]);
+    }, [selectedConversation, setMessages, token]);
 
-    return { messages, loading };
+    return { loading };
 };
 
 export default useGetMessages;
