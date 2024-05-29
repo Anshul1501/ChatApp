@@ -32,6 +32,8 @@ const fetchUser = async(req, res, next) => {
             return res.status(404).json({ error: "USER NOT FOUND" });
         }
 
+        console.log("User found:", user); // Log the entire user object
+
         req.user = user;
         next();
     } catch (error) {
@@ -41,4 +43,3 @@ const fetchUser = async(req, res, next) => {
 };
 
 module.exports = fetchUser;
-

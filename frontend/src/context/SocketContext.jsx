@@ -1,8 +1,12 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useAuthContext } from './AuthContext';
-import { io } from 'socket.io-client'; // Correct import for socket.io-client
+import { io } from 'socket.io-client';
 
-export const SocketContext = createContext();
+const SocketContext = createContext();
+
+export const useSocketContext = () => {
+    return useContext(SocketContext);
+}
 
 export const SocketContextProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
@@ -11,22 +15,19 @@ export const SocketContextProvider = ({ children }) => {
 
     useEffect(() => {
         if (authUser) {
-            const newSocket = io("http://localhost:5000"); // Initialize socket connection
+            const newSocket = io("http://localhost:3000", { // Ensure the port matches your backend server
+                query: {
+                    userId: authUser.userId,
+                },
+            });
+
             setSocket(newSocket);
 
-            newSocket.on('connect', () => {
-                console.log('Socket connected:', newSocket.id);
+            newSocket.on("getOnlineUsers", (users) => {
+                setOnlineUsers(users);
             });
 
-            newSocket.on('disconnect', () => {
-                console.log('Socket disconnected');
-            });
-
-            // Clean up on unmount or when authUser changes
-            return () => {
-                newSocket.close();
-                setSocket(null);
-            };
+            return () => newSocket.close();
         } else {
             if (socket) {
                 socket.close();

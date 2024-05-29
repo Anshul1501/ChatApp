@@ -15,7 +15,9 @@ export const AuthContextProvider = ({ children }) => {
         if (storedUser) {
             const { token, ...rest } = JSON.parse(storedUser);
             const decodedUser = jwtDecode(token);
-            setAuthUser({ ...rest, userId: decodedUser.userId }); // Make sure to use userId here
+            const user = { ...rest, userId: decodedUser.userId, fullName: decodedUser.fullName }; // Make sure to use userId here
+            setAuthUser(user);
+            console.log("AuthUser set in context:", user);
         }
     }, []);
 

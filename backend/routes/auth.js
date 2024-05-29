@@ -61,7 +61,7 @@ router.post(
             await user.save();
 
             // Generate JWT token
-            generateTokenAndSetCookie(user._id, res, (token) => {
+            generateTokenAndSetCookie(user._id, user.fullName, res, (token) => {
                 console.log(token);
                 // Send JWT token in response
                 res.json({ token });
@@ -102,7 +102,7 @@ router.post(
             }
 
             // Generate JWT token
-            generateTokenAndSetCookie(foundUser._id, res, (token) => {
+            generateTokenAndSetCookie(foundUser._id, foundUser.fullName, res, (token) => {
                 console.log(token);
                 // Send JWT token in response
                 res.json({ success: true, token });

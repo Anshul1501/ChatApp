@@ -3,17 +3,19 @@ import Message from './Message';
 import useGetMessages from '../../hooks/useGetMessages';
 import MessageSkeleton from '../skeletons/MessageSkeleton';
 import useConversation from '../../zustand/useConversation';
+import useListenMessages from '../../hooks/useListenMessages';
 
 const Messages = () => {
   const { loading } = useGetMessages();
-  const { messages: localMessages } = useConversation(); // Get local messages from Zustand
+  const { messages: localMessages } = useConversation();
+  useListenMessages();
   const lastMessageRef = useRef();
 
   useEffect(() => {
     setTimeout(() => {
       lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
-  }, [localMessages]); // Watch localMessages
+  }, [localMessages]);
 
   return (
     <div className='px-4 flex-1 overflow-auto'>
@@ -32,27 +34,3 @@ const Messages = () => {
 };
 
 export default Messages;
-
-
-// STARTER CODE SINPPIT
-// export default Messages;
-// import React from 'react'
-// import Message from './ Message';
-// 
-// 
-// const Messages = () => {
-// 
-//   return (
-//     <div className='px-4 flex-1 overflow-auto'>
-//       <Message/>
-//       <Message/>
-//       <Message/>
-//       <Message/>
-//       <Message/>
-//       <Message/>
-//     </div>
-//   )
-// }
-// 
-// export default Messages;
-// 
