@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode"; // Note the corrected import
 
 export const AuthContext = createContext();
 
@@ -13,9 +13,9 @@ export const AuthContextProvider = ({ children }) => {
     useEffect(() => {
         const storedUser = localStorage.getItem("chat-user");
         if (storedUser) {
-            const token = JSON.parse(storedUser).token;
+            const { token, ...rest } = JSON.parse(storedUser);
             const decodedUser = jwtDecode(token);
-            setAuthUser({ ...JSON.parse(storedUser), _id: decodedUser.userId });
+            setAuthUser({ ...rest, userId: decodedUser.userId }); // Make sure to use userId here
         }
     }, []);
 

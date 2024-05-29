@@ -6,11 +6,12 @@ const Message = ({ message }) => {
     const { authUser } = useAuthContext();
     const { selectedConversation } = useConversation();
     
-    const fromMe = message.senderId === authUser._id;
+    // Corrected comparison logic
+    const fromMe = message.senderId === authUser.userId;
     const formattedTime = extractTime(message.createdAt);
     const chatClassName = fromMe ? "chat-end" : "chat-start";
     const profilePic = fromMe ? authUser.profilePic : selectedConversation?.profilePic;
-    const bubbleBgColor = fromMe ? "bg-blue-500" : "";
+    const bubbleBgColor = fromMe ? "bg-blue-500" : "bg-gray-300"; // Ensure both sides have a color
 
     const shakeClass = message.shouldShake ? "shake" : "";
 
@@ -26,4 +27,5 @@ const Message = ({ message }) => {
         </div>
     );
 };
+
 export default Message;
