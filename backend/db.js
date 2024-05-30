@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
-const mongoURI = "mongodb://localhost:27017/ChatApp";
-
+const dotenv = require('dotenv');
+dotenv.config();
 async function connectToMongo() {
     await mongoose
-        .connect(mongoURI)
+        .connect(process.env.MONGO_DB_URI)
         .then(() => console.log("Connected to Mongo Successfully"))
         .catch((err) => console.log(err));
 }
