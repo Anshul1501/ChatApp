@@ -32,5 +32,42 @@ io.on("connection", (socket) => {
         delete userSocketMap[userId];
         io.emit("getOnlineUsers", Object.keys(userSocketMap));
     });
+
+    socket.on("sendMessage", async(data) => {
+        try {
+            console.log("Message received:", data);
+
+            // Validate incoming data
+            if (!data.senderId || !data.receiverId || !data.message) {
+                throw new Error('Missing required fields: senderId, receiverId, or message');
+            }
+
+            // Save the message to the database
+            const newMessage = new Message({
+                sender: data.senderId,
+                receiver: data.receiverId,
+                text: data.message,
+            });
+
+            await newMessage.save();
+
+            console.log("Message saved:", newMessage);
+
+            // Send the message to the receiver if they are online
+            const receiverSocketId = getReceiverSocketId(data.receiverId);
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit("receiveMessage", newMessage);
+                console.log("Message sent to receiver:", data.receiverId);
+            }
+
+            // Respond back to the sender
+            socket.emit("messageSent", newMessage);
+            console.log("Message sent to sender:", newMessage);
+
+        } catch (error) {
+            console.error("Error handling sendMessage event:", error.message);
+            socket.emit("error", { error: "Internal Server Error" });
+        }
+    });
 });
 module.exports = { app, server, getReceiverSocketId, io };

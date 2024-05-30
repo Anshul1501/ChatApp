@@ -19,5 +19,5 @@ app.use("/api/messages", require("./routes/messages"));
 app.use("/api/users", require("./routes/userRoutes"));
 
 server.listen(port, () => {
-    console.log(`chatApp backend listening on port ${port}`);
+    console.log(`chatApp server backend listening on port ${port}`);
 });

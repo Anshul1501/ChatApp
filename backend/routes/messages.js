@@ -3,7 +3,7 @@ const router = express.Router();
 const Conversation = require("../models/Conversation");
 const Messages = require("../models/Messages");
 const fetchUser = require("../middleware/fetchUser");
-const { getReceiverSocketId } = require("../socket/socket");
+const { getReceiverSocketId, io } = require("../socket/socket");
 
 // Route 1: Send messages POST : "api/message/send/:id". LOGIN REQUIRED
 router.post("/send/:id", fetchUser, async(req, res) => {

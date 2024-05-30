@@ -7,8 +7,8 @@ import useListenMessages from '../../hooks/useListenMessages';
 
 const Messages = () => {
   const { loading } = useGetMessages();
-  const { messages: localMessages } = useConversation();
   useListenMessages();
+  const { messages: localMessages } = useConversation();
   const lastMessageRef = useRef();
 
   useEffect(() => {
