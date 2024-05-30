@@ -15,7 +15,7 @@ export const SocketContextProvider = ({ children }) => {
 
     useEffect(() => {
         if (authUser) {
-            const newSocket = io("http://localhost:5000", { // Ensure the port matches your backend server
+            const newSocket = io("https://chatapp-production-7sv0.onrender.com", { // Ensure the port matches your backend server
                 query: {
                     userId: authUser.userId,
                 },
