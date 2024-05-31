@@ -6,11 +6,13 @@ const Message = ({ message }) => {
     const { authUser } = useAuthContext();
     const { selectedConversation } = useConversation();
     
-    // Corrected comparison logic
+    
     const fromMe = message.senderId === authUser.userId;
     const formattedTime = extractTime(message.createdAt);
     const chatClassName = fromMe ? "chat-end" : "chat-start";
-    const profilePic = fromMe ? authUser.profilePic : selectedConversation?.profilePic;
+
+    const userProfilePic = `https://ui-avatars.com/api/?name=${authUser.fullName}`
+    const profilePic = fromMe ? userProfilePic : selectedConversation?.profilePic;
     const bubbleBgColor = fromMe ? "bg-blue-500" : "bg-white-300"; // Ensure both sides have a color
 
     const shakeClass = message.shouldShake ? "shake" : "";
