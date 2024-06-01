@@ -27,8 +27,9 @@ A real-time chat application developed using the MERN stack (MongoDB, Express.js
 
 ### Configure environment variables:
 
-MONGO_DB_URI = 
-JWT_SECRET = 
-PORT = 
+- **MONGO_DB_URI = 
+- **JWT_SECRET = 
+- **PORT = 
 
-[visit chatApp]: (https://chatapp-production-7sv0.onrender.com)
+### Visit At
+[chatApp]: (https://chatapp-production-7sv0.onrender.com)
