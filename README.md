@@ -31,4 +31,4 @@ A real-time chat application developed using the MERN stack (MongoDB, Express.js
 - **JWT_SECRET = 
 - **PORT =
   
-[chatApp]: (https://chatapp-production-7sv0.onrender.com)
+[visit: ](https://chatapp-production-7sv0.onrender.com)
